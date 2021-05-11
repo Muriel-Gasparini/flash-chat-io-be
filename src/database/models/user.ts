@@ -1,7 +1,7 @@
 import mongoose, { Document } from 'mongoose'
 import { BcryptService } from '../../services/encrypter/bcrypt'
 
-interface IUser extends Document {
+export interface IUser extends Document {
   name: string,
   email: string
   birthdate: Date
@@ -35,12 +35,11 @@ userSchema.pre<IUser>('save', async function (next): Promise<void> {
 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-userSchema.post(/save/, (error: any, _doc: any, next: any): Error | void => {
+userSchema.post("save", (error: any, _doc: any, next: any): Error | void => {
   if (error.code === 11000) {
-    console.log(error, _doc)
     throw error
   }
   next()
 })
 
-export default mongoose.model('Users', userSchema)
+export default mongoose.model<IUser>('Users', userSchema)
