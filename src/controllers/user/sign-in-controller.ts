@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { UserRepository } from '../../database/repositories/user-repository'
 import { BcryptService } from '../../services/encrypter/bcrypt'
-import { createJwtService } from '../../services/JsonWebToken/JwtService'
+import { createJwtService } from '../../services/jsonWebToken/JwtService'
 
 const userRepository = new UserRepository()
 
