@@ -1,3 +1,4 @@
+import { createJwtService } from '../../services/jsonWebToken/JwtService'
 import User, { IUser } from '../models/user'
 
 class UserRepository {
@@ -21,7 +22,43 @@ class UserRepository {
 
       return user
     } catch (error) {
-      return error
+      throw new Error(error)
+    }
+  }
+
+  async findById(id: string): Promise<IUser> {
+    try {
+      const user = await User.findOne({ _id: id })
+
+      if (!user) {
+        throw new Error('This account does not exist')
+      }
+
+      return user
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  async getUserByToken (headerAuthorization: string | undefined): Promise<IUser | undefined> {
+    try {
+      if (!headerAuthorization) {
+        throw 'Invalid Token'
+      }
+  
+      const jwtService = createJwtService()
+      const userRepository = new UserRepository()
+    
+      const tokenPrefix = 'Bearer '
+      const userToken = headerAuthorization?.replace(tokenPrefix, '') || ''
+    
+      const { data } = await jwtService.getTokenPayload(userToken)
+      
+      const userAccount = await userRepository.findById(data)
+      
+      return userAccount
+    } catch (error) {
+      throw new Error(error)
     }
   }
 }
