@@ -19,7 +19,7 @@ async function SignInController (req: Request, res: Response): Promise<void> {
 
     const token = jwtService.createToken({ data: user.id })
 
-    res.status(200).json({ token })
+    res.status(200).json({ token, id: user.id  })
   } catch (error) {
     console.log(error)
     res.status(500).json({ error })

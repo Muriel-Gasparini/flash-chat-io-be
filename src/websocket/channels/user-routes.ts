@@ -1,21 +1,26 @@
 import { Socket } from "socket.io";
 
+import { getAllGlobalMessages } from "./global-messages-channel";
 import { messageChannel } from "./message";
 
-const USER_CHANNELS_PATH = {
-  MESSAGES: 'messages'
+const ROUTES_PATH = {
+  GLOBAL_MESSAGES: 'global_messages'
 }
 
 const USER_CHANNELS = {
-  [USER_CHANNELS_PATH.MESSAGES]: messageChannel
+  [ROUTES_PATH.GLOBAL_MESSAGES]: messageChannel
 }
 
-const { MESSAGES } = USER_CHANNELS_PATH
+const { GLOBAL_MESSAGES } = ROUTES_PATH
 
 async function setUserRoutes (socket: Socket): Promise<void> {
   console.log(`USER CONNECTED:  ${socket.id}`)
-  socket.on(MESSAGES, (message) => USER_CHANNELS[MESSAGES](message, socket.data.user))
+
+  const allMessages = await getAllGlobalMessages(socket)
+  socket.join(GLOBAL_MESSAGES)
+  socket.emit(GLOBAL_MESSAGES, allMessages)
+
+  socket.on(GLOBAL_MESSAGES, (message) => USER_CHANNELS[GLOBAL_MESSAGES](message, socket))
 }
 
-
-export {setUserRoutes}
+export { setUserRoutes }

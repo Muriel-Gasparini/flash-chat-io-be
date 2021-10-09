@@ -1,5 +1,6 @@
 import { Router, Express } from 'express'
 
+import { meController } from '../controllers/user/me-controller'
 import { SignInController } from '../controllers/user/sign-in-controller'
 import { SignUpController } from '../controllers/user/sign-up-controller'
 import { RequestBodyValidator } from '../middlewares/request-body-validation/request-validator'
@@ -8,10 +9,9 @@ import { RequestBodyValidator } from '../middlewares/request-body-validation/req
 function setRoutes (app: Express): void {
   const router = Router()
 
-  router.use(RequestBodyValidator)
-
-  router.post('/sign-up', SignUpController)
-  router.post('/sign-in', SignInController)
+  router.get('/me', meController)
+  router.post('/sign-up', RequestBodyValidator, SignUpController)
+  router.post('/sign-in', RequestBodyValidator, SignInController)
 
   app.use('/', router)
 }

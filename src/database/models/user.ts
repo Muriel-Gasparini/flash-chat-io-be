@@ -1,14 +1,16 @@
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
+
 import { BcryptService } from '../../services/encrypter/bcrypt'
 
-export interface IUser extends Document {
+export interface IUser {
+  id: string
   name: string,
   email: string
   birthdate: Date
   password: string
 }
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
     required: true
@@ -25,9 +27,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    select: false
   }
-})
+}, { timestamps: true })
 
 userSchema.pre<IUser>('save', async function (next): Promise<void> {
   this.password = await BcryptService.hashString(this.password)
