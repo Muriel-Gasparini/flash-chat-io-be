@@ -4,10 +4,11 @@ import { BcryptService } from '../../services/encrypter/bcrypt'
 
 export interface IUser {
   id: string
-  name: string,
+  name: string
   email: string
   birthdate: Date
   password: string
+  photo: string
 }
 
 const userSchema = new Schema<IUser>({
@@ -29,6 +30,10 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     select: false
+  },
+  photo: {
+    type: String,
+    required: true
   }
 }, { timestamps: true })
 

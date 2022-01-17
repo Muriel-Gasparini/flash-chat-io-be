@@ -5,7 +5,7 @@ import { helmetMiddleware } from './helmet'
 function setMiddlewares (app: Express): void {
   app.use(helmetMiddleware)
   app.use(corsMiddleware)
-  app.use(express.json())
+  app.use(express.json({limit: 5000000}))
 }
 
 export {setMiddlewares}
