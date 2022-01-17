@@ -6,19 +6,21 @@ import { variables } from '../config/envs'
 import { connectOnDatabase } from '../database/connection'
 import { setMiddlewares } from './middlewares/set-middlewares'
 import { setRoutes } from './routes'
-import { setChannels } from '../websocket/set-channels'
+import { WebsocketChannels } from '../websocket/websocket-channels'
 
 const app = express()
 const server = http.createServer(app)
 const io = new Server(server, {
   cors: {
-    origin: variables.websocketCorsOrigin
+    origin: "*"
   }
 })
+
+const websocketChannels = new WebsocketChannels(io)
 
 connectOnDatabase()
 setMiddlewares(app)
 setRoutes(app)
-setChannels(io)
+websocketChannels.initializeChannels()
 
 server.listen(variables.port, () => console.log(`Server Online on Port ${variables.port}`))

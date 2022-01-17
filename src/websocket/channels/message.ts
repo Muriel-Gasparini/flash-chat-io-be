@@ -19,7 +19,7 @@ async function messageChannel (message: string, socket: Socket): Promise<void> {
 
     const allMessages = await getAllGlobalMessages(socket)
 
-    socket.broadcast.emit('global_messages', allMessages)
+    socket.broadcast.emit('chat', allMessages)
   } catch (error) {
     console.log("ERROR: ", error)
     socket.emit('error', error)
