@@ -10,7 +10,8 @@ export interface NextSocketFunction {
 async function authMiddleware(socket: Socket, next: NextSocketFunction): Promise<void> {
   try {
     const userRepository = new UserRepository()
-    const authorizationToken = socket.handshake.headers.authorization
+
+    const authorizationToken = socket.handshake.auth?.token
 
     const userAccount = await userRepository.getUserByToken(authorizationToken)
     
@@ -22,15 +23,7 @@ async function authMiddleware(socket: Socket, next: NextSocketFunction): Promise
     next()
   } catch (error) {
     console.log(error)
-    if (error.authError) {
-      return next(new Error(error.authError))
-    }
-    
-    if (/error|Error/gm.test(error.message)) {
-      return next(new Error("You need to login"))
-    }
-
-    next(new Error("unknown user"));
+    next(new Error("You need to login"));
   }
 }
 
