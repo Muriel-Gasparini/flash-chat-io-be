@@ -7,8 +7,9 @@ const userRepository = new UserRepository()
 
 async function SignInController (req: Request, res: Response): Promise<void> {
   try {
-    const user = await userRepository.findByEmail(req.body.email)
-    
+    const getUserPassword = true
+    const user = await userRepository.findByEmail(req.body.email, getUserPassword)
+
     const passwordIsValid = await BcryptService.compareHashedString(req.body.password, user.password)
 
     if (!passwordIsValid) {
