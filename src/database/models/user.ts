@@ -38,7 +38,8 @@ const userSchema = new Schema<IUser>({
 }, { timestamps: true })
 
 userSchema.pre<IUser>('save', async function (next): Promise<void> {
-  this.password = await BcryptService.hashString(this.password)
+  const bcryptService = new BcryptService() 
+  this.password = await bcryptService.crypt(this.password)
   return next()
 })
 
