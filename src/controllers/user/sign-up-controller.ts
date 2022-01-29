@@ -1,16 +1,45 @@
-import { Request, Response } from 'express'
-import { UserRepository } from '../../database/repositories/user-repository'
+import { Request, Response } from "express";
 
-const userRepository = new UserRepository()
+import { BaseController, IBaseHttpController } from "../../core/http";
+import { UserRepository } from "../../database/repositories/user/user-repository";
 
-async function SignUpController (req: Request, res: Response): Promise<void> {
-  try {
-    const userAccount = await userRepository.create(req.body)
-    res.status(201).json(userAccount)
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error })    
+interface ISignUpController extends IBaseHttpController {
+  userRepository: UserRepository
+}
+
+class SignUpController extends BaseController implements ISignUpController {
+  userRepository: UserRepository;
+
+  constructor(
+    httpRequest: Request,
+    httpResponse: Response,
+    userRepository: UserRepository
+  ) {
+    super(httpRequest, httpResponse)
+    this.userRepository = userRepository
+  }
+
+  async controller(): Promise<void> {
+    try {
+      const { user, error } = await this.userRepository.create(this.request.body)
+      
+      if (error) {
+        return this.httpResponseHandler.badRequest(error)
+      }
+
+      this.httpResponseHandler.created({ user })
+    } catch (error) {
+      console.log(error)
+      if (error instanceof Error) {
+        this.httpResponseHandler.internalError(error)
+      }
+    }
   }
 }
 
-export { SignUpController }
+const useSignUpController = (request: Request, response: Response) => {
+  const userRepository = new UserRepository()
+  new SignUpController(request, response, userRepository).controller()
+}
+
+export { SignUpController, useSignUpController }

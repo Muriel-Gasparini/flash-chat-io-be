@@ -1,28 +1,48 @@
 import { Request, Response } from "express";
 
-import { UserRepository } from "../../database/repositories/user-repository";
-import { createJwtService } from "../../services/jsonWebToken/JwtService";
+import { BaseController, IBaseHttpController } from "../../core/http";
+import { UserRepository } from "../../database/repositories/user";
 
-async function meController(req: Request, res: Response) {
-  try {
-    const jwtService = createJwtService()
-    const userRepository = new UserRepository()
+interface IMeController extends IBaseHttpController {
+  userRepository: UserRepository
+}
 
-    const userToken = req.headers.authorization?.replace('Bearer ', '')
+class MeController extends BaseController implements IMeController {
+  userRepository: UserRepository;
+  
+  constructor(
+    httpRequest: Request,
+    httpResponse: Response,
+    userRepository: UserRepository,
+  ) {
+    super(httpRequest, httpResponse)
+    this.userRepository = userRepository
+  }
 
-    if (!userToken) {
-      return res.status(401).json({ error: 'No token provided' })
+  async controller() {
+    try {
+      const { userId } = this.response.locals
+      
+      const { user, error } = await this.userRepository.findById(userId)
+  
+      if (error) {
+        this.httpResponseHandler.badRequest(error)
+        return
+      }
+
+      this.httpResponseHandler.success({ user })
+    } catch (error) {
+      console.log(error)
+      if (error instanceof Error) {
+        this.httpResponseHandler.internalError(error)
+      }
     }
-
-    const { data } = await jwtService.getTokenPayload(userToken)
-
-    const userAccount = await userRepository.findById(data)
-
-    res.status(200).json(userAccount)
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'An internal error ocurred' })    
   }
 }
 
-export { meController }
+const useMeController = (httpRequest: Request, httpResponse: Response) => {
+  const userRepository = new UserRepository()
+  new MeController(httpRequest, httpResponse, userRepository).controller()
+}
+
+export { MeController, useMeController }
