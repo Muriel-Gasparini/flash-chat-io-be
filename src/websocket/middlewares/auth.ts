@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { ExtendedError } from "socket.io/dist/namespace";
 
-import { UserRepository } from "../../database/repositories/user-repository";
+import { UserRepository } from "../../database/repositories/user/user-repository";
 
 export interface NextSocketFunction {
   (err?: ExtendedError | undefined): void
