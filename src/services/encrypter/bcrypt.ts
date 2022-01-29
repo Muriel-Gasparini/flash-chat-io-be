@@ -1,13 +1,16 @@
 import { hash, compare } from 'bcryptjs'
 import { variables } from '../../config/envs'
 
-class BcryptService {
-  
-  static async hashString (data: string): Promise<string> {
+interface IBcryptService {
+  crypt(text: string): Promise<string>
+  decrypt(textToCompare: string, hashedString: string): Promise<boolean>
+}
+class BcryptService implements IBcryptService{
+  async crypt (data: string): Promise<string> {
     return hash(data, variables.hashSalt)
   }
 
-  static async compareHashedString (string: string, hashedString: string): Promise<boolean> {
+  async decrypt (string: string, hashedString: string): Promise<boolean> {
     return await compare(string, hashedString)
   }
 }

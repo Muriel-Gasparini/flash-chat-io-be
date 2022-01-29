@@ -2,10 +2,17 @@ import { sign, verify } from 'jsonwebtoken'
 import { variables } from '../../config/envs'
 
 interface jwtPayload {
-  data: string
+  data?: object | string
+  error?: Error
 }
 
-class JwtService {
+interface IJwtService {
+  SECRET: string
+  createToken (payload: jwtPayload ): string
+  getTokenPayload (token: string): Promise<jwtPayload>
+}
+
+class JwtService implements IJwtService{
 
   SECRET = variables.jwtSecret
 
@@ -23,7 +30,7 @@ class JwtService {
         if (!payload) return reject('Token malformatted')
 
         if (Object.keys(payload).includes('data')) {
-          resolve(JSON.parse(JSON.stringify(payload)))
+          resolve(payload)
         }
       })
     })
